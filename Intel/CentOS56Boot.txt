@@ -1,0 +1,54 @@
+1、用虚拟机测试。
+2、先安装一个最小的centos5.6，分区的时候只分一个区，不用swap分区，也不用lvm之类的。
+3、增加一个512MiB的虚拟硬盘。
+4、在centos5.6上用fdisk命令将512MiB的虚拟硬盘只分一个区，并用mkfs.ext3命令将分区格式化成ext3文件系统。
+5、挂载新分区，进入挂载目录，并在上面创建或复制一些文件夹和文件。最终tree命令看出如下：
+|--bin
+|  `--bash
+|--boot
+|  |--grub
+|  |  |--e2fs_stage1_5
+|  |  |--grub.conf
+|  |  |--stage1
+|  |  `--stage2
+|  |--initrd-2.6.18-238.e15.img
+|  `--vmlinuz-2.6.18-238.e15
+|--dev
+|--etc
+|  |--inittab
+|  `--rc.d
+|     `--rc.sysinit
+|--lib
+|--lost+found
+`--sbin
+   `--init
+6、创建控制台设备节点，mknod -m 0600 dev/console c 5 1
+7、依次ldd /sbin/init，ldd /bin/bash，并将依赖库复制到lib下。
+8、修改etc/inittab，删减只留下两行
+id:3:initdefault
+si::sysinit:/etc/rc.d/rc.sysinit
+9、修改etc/rc.d/rc.sysinit成
+#!/bin/bash
+export PATH=/sbin:/bin
+echo "Welcome to here"
+/bin/bash
+10、修改boot/grub/grub.conf成
+default=0
+timeout=5
+title CentOS (2.6.18-238.e15)
+ root (hd0,0)
+ kernel /boot/vmlinuz-2.6.18-238.e15 ro root=/dev/sda1
+ initrd /boot/initrd-2.6.18-238.e15.img
+11、卸载目录，然后grub命令进入交互模式，依次执行root (hd1,0); setup(hd1)，执行root是可用tab补齐功能确认找对目录了。
+12、创建一个虚拟机，使用这个512MiB的虚拟硬盘。
+
+--------------------------------------------------------------------------------------------------------------
+相比centos5.x，centos6.4需要多创建sys和proc文件夹，否则会出现
+mount: /dev/sda1 already mounted or /sysroot busy
+mount: according to mtab, /dev/sda1 is already mounted on /sysroot这样极具误导性的警告。
+启动参数kernel比较长，在原来的基础上改成
+kernel /boot/vmlinuz-2.6.32-358.el6.i686 ro root=/dev/sda1 rd_NO_LUKS KEYBOARDTYPE=pc KEYTABLE=us rd_NO_MD crashkernel=auto LANG=zh_CN.UTF-8 rd_NO_LVM rd_NO_DM selinux=0
+相比centos5.x，centos6.x的init系统由sysvinit变成upstart，所以要将/etc/init/下的脚本要复制过来，
+相关的依赖太多，最后搞不定。
+centos7.x的init系统是systemd，又变了。 
+
