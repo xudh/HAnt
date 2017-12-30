@@ -12,7 +12,8 @@ CFLAGS += -I$(INC_DIR)
 
 OBJS :=	$(SRC_DIR)/Common		\
 		$(SRC_DIR)/ReadWrite	\
-		$(SRC_DIR)/Uart
+		$(SRC_DIR)/Uart			\
+		$(SRC_DIR)/PThread
 
 OBJS := $(foreach obj, $(OBJS), $(obj).o)
 $(SRC_DIR)/%.o: $(SRC_DIR)/%.c
@@ -20,7 +21,7 @@ $(SRC_DIR)/%.o: $(SRC_DIR)/%.c
 
 $(LIB_TARGET): $(OBJS)
 	$(AR) ruc  $(LIB_TARGET) $(OBJS)
-	mv $(LIB_TARGET) $(LIB_DIR)
+	mv $(LIB_TARGET) $(LIB_DIR)/
 
 clean:
 	rm -f $(OBJS)
