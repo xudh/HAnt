@@ -2,17 +2,17 @@
 
 cd Function
 make clean; make
-cp -f Library/LibFunction.a ../Library
+cp -f Library/libFunction.a ../Library
 cd -
 
 cd Config
 make clean; make
-cp -f Library/LibConfig.a ../Library
+cp -f Library/libConfig.a ../Library
 cd -
 
 cd Page
 make clean; make
-cp -f Library/LibPage.a ../Library
+cp -f Library/libPage.a ../Library
 cd -
 
 cd Bussiness

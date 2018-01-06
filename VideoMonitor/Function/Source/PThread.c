@@ -21,7 +21,8 @@ int CreateThread(pthread_t *pTid, void *(*start_routine)(void *), void *arg, siz
 	pthread_attr_getschedparam(&attr, &sch);
 	sch.sched_priority = ((prior == eHighPrior) ? 30 : ((prior == eMiddlePrior) ? 50 : 70));
 	pthread_attr_setschedparam(&attr, &sch);
-	pthread_attr_setstacksize(&attr, stackSize);
+	if (stackSize != 0)
+		pthread_attr_setstacksize(&attr, stackSize);
 	if (selfDetach)
 		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 	if (pthread_create(pTid, &attr, start_routine, arg) != 0)
